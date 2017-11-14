@@ -150,19 +150,6 @@ class Base(Configuration):
     }
 
     CORS_ORIGIN_ALLOW_ALL = True
-    # settings.py
-    REST_PROXY = {
-        'HOST': bytes(
-            os.environ.get('ACCELERATE_SITE_URL',
-                           'https://accelerate.masschallenge.org'), 'utf-8'),
-        'AUTH': {
-            'user': None,
-            'password': None,
-            # Or alternatively:
-            'token': None,
-        },
-        'VERIFY_SSL': False,
-    }
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
