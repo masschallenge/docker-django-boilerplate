@@ -64,7 +64,7 @@ target_help = \
   "stop - Stops all docker containers." \
   "superuser - Creates a superuser account in the Django process." \
   "test - Run tests. To run a single test:" \
-  "\tmake test TESTS='impact.tests.test_api_routes.TestApiRoute.test_api_object_get impact.tests.test_api_routes.TestApiRoute.test_api_object_delete'"
+  "\tmake test TESTS='directory.tests.test_api_routes"
 
 
 load_db_error_msg = GZ_FILE must be set. \
@@ -162,7 +162,7 @@ coverage-run:
 coverage-report: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
    then echo "development"; else echo "${BRANCH}"; fi;)
 coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
-coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
+coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/directory/::g)
 coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
 coverage-report:
 	@docker-compose run --rm web coverage report --skip-covered $(diff_grep) | grep -v "NoSource:"
@@ -171,14 +171,14 @@ coverage-html:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
 
 coverage-html-open: coverage-html
-	@open web/impact/htmlcov/index.html
+	@open web/directory/htmlcov/index.html
 
 demo:
 	@docker-compose run --rm web ./manage.py make_demo_users
 	@docker-compose run --rm web ./manage.py make_demo_apps
 
 lint:
-	@docker-compose run --rm web pylint impact
+	@docker-compose run --rm web pylint directory
 
 messages:
 	@docker-compose exec web python manage.py makemessages -a
@@ -224,7 +224,7 @@ endif
 
 deploy: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 deploy:
-	@ecs deploy --ignore-warnings $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
+	@ecs deploy --ignore-warnings $(ENVIRONMENT) directory --image web $(DOCKER_REGISTRY)/accelerator-directory:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 
 release: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 release:
@@ -240,9 +240,9 @@ endif
 	@echo "tagging image ${IMAGE_TAG}"
 	@eval $(aws ecr get-login --region us-east-1);
 	@ecs-cli configure --region us-east-1 --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY) --cluster $(ENVIRONMENT);
-	@docker tag impactapi_web:latest $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
-	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
-	@docker tag impactapi_redis:latest $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
+	@docker tag acceleratordirectory_web:latest $(DOCKER_REGISTRY)/accelerator-directory:$(IMAGE_TAG)
+	@docker push $(DOCKER_REGISTRY)/accelerator-directory:$(IMAGE_TAG)
+	@docker tag acceleratordirectory_redis:latest $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@ecs-cli compose -f docker-compose.prod.yml down
 	@ecs-cli compose -f docker-compose.prod.yml up

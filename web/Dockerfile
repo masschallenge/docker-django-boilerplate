@@ -2,7 +2,7 @@ FROM python:3.6
 
 WORKDIR /wwwroot
 
-COPY impact /wwwroot
+COPY directory /wwwroot
 
 COPY scripts/start.sh /usr/bin
 
@@ -21,15 +21,15 @@ RUN easy_install-2.7 supervisor
 
 RUN pip3 install -r requirements/dev.txt
 
-RUN useradd -s /bin/bash -u 3000 -M impact_user
+RUN useradd -s /bin/bash -u 3000 -M directory_user
 
-RUN chown impact_user /usr/bin/start.sh
+RUN chown directory_user /usr/bin/start.sh
 
-RUN chown -R impact_user /wwwroot
+RUN chown -R directory_user /wwwroot
 
 RUN apt-get install -y gettext
 
-USER impact_user
+USER directory_user
 
 ENV PYTHONUNBUFFERED 1
 
