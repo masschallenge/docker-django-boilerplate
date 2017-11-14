@@ -181,11 +181,11 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# impact-api
+# directory-api
 local_settings.py
 mysql/data/
-web/impact/.coverage
-web/impact/htmlcov/
+web/directory/.coverage
+web/directory/htmlcov/
 db_cache/
 *~
 *.orig

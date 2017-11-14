@@ -1,0 +1,18 @@
+version: '2'
+services:
+  web:
+    image: #todo: configure this
+    env_file: .prod.env
+    user: root
+    links:
+      - redis
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "443:443"
+      - "80:80"
+  redis:
+    image: #todo: configure this
+    volumes:
+      - "redis:/var/lib/redis/data:rw"

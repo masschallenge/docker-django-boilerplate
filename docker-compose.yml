@@ -1,0 +1,70 @@
+version: '2'
+services:
+  mysql:
+    image: mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/data:/var/lib/mysql
+      - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mc_dev
+  # Redis
+  redis:
+    build:
+      dockerfile: redis.Dockerfile
+      context: .
+    volumes:
+      - ./redis:/var/lib/redis/data
+    ports:
+      - "${REDIS_PORT}:6379"
+  assets:
+    image: donnex/assets
+    ports:
+      - "${DONNEX_ASSETS_PORT}:${DONNEX_ASSETS_PORT}"
+    volumes:
+      - ./assets/gulpfile.js:/gulp/gulpfile.js:ro
+      - ./web/directory/sass:/gulp/sass
+      - ./web/directory/static/css:/gulp/css
+      - ./web/directory/static/js:/gulp/js
+  # Web python
+  web:
+    build:
+      args:
+        - localhost_port=${LOCALHOST_PORT}
+      context: ./web
+    ports:
+      - "${HTTP_PORT}:80"
+      - "${HTTPS_PORT}:443"
+      - "${LOCALHOST_PORT}:${LOCALHOST_PORT}"
+    expose:
+      - "80"
+      - "443"
+    volumes:
+      - ./web/directory:/wwwroot
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web/directory/media:/media:ro
+    depends_on:
+      - mysql
+    links:
+      - mysql
+      - redis
+    env_file: .dev.env
+    user: root
+  start_dependencies:
+      image: "python:3.6"
+      depends_on:
+        - web
+        - mysql
+      links:
+        - mysql
+        - redis
+        - web
+      command: >
+        /bin/bash -c "
+        until $$(curl --output /dev/null --silent --head --fail http://web:${LOCALHOST_PORT}); do
+              echo \"BUILDING...\"
+              sleep 5
+          done; echo \"BUILD COMPLETE - visit http://localhost:${LOCALHOST_PORT} in a browser\";"

@@ -15,7 +15,7 @@ _Copyright (c) 2017 MassChallenge, Inc._
 2. Start Docker.
 
 
-4. Install impact-api and spin up a dev server. 
+3. Install impact-api and spin up a dev server. 
 The accelerator-directory code is currently designed to 
 work with an instance of the MassChallenge's impact-api, and relevant 
 depenedencies. Make sure to install it and run it by following the steps 
@@ -39,7 +39,21 @@ git clone https://github.com/masschallenge/accelerator-directory.git
 cd accelerator-directory
 ```
 
-5. Run tests.  From the accelerator-directory source directory run:
+5. Configure the docker-compose with a .env file. Do this by copying 
+`.env.template` as `.env`, and set configurations for this project. 
+Ports set must not be already used on your localhost. The configuration is
+valid if running `docker-compose config` prints a valid docker-compose file.
+
+Also, make sure the following are configured manually:
+- redis port is configured correctly in the `DJANGO_HIREDIS_CACHE_LOCATION` 
+variable in _.dev.env_.
+- localhost port is configured correctly in the `proxy_pass` variable in 
+_web/nginx/nginx.conf_.
+- localhost port is configured correctly in _web/scripts/start-nodaemon.sh_.
+- localhost port is configured correctly in _supervisord.conf_.
+
+
+6. Run tests.  From the accelerator-directory source directory run:
 ```
 make build
 make test
@@ -62,8 +76,8 @@ make dev
 ```
 
 Once the process completes (it will take a little while and the last
-line should say "BUILD COMPLETE"), visit http://localhost:8000 in a
-browser to see the login screen.
+line should say "BUILD COMPLETE"), visit http://localhost:8001 in a
+browser to see the login screen (or the custom port you configured).
 
 
 7. Go to http://localhost:8001. You should be able to use a simple search
